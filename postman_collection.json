@@ -1,0 +1,263 @@
+{
+  "info": {
+    "name": "Portfolio Management API",
+    "description": "API collection for Portfolio Management Application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Portfolios",
+      "item": [
+        {
+          "name": "Get All Portfolios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/portfolios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios"]
+            }
+          }
+        },
+        {
+          "name": "Create Portfolio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tech Growth Portfolio\",\n  \"description\": \"Focus on technology stocks for long-term growth\",\n  \"user_type\": \"retail_investor\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/portfolios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios"]
+            }
+          }
+        },
+        {
+          "name": "Get Portfolio by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Portfolio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Portfolio Name\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Portfolio",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Portfolio Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Holdings",
+      "item": [
+        {
+          "name": "Get Portfolio Holdings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1/holdings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1", "holdings"]
+            }
+          }
+        },
+        {
+          "name": "Add Holding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticker\": \"AAPL\",\n  \"shares\": 10,\n  \"purchase_price\": 150.00,\n  \"purchase_date\": \"2024-01-15T00:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1/holdings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1", "holdings"]
+            }
+          }
+        },
+        {
+          "name": "Get Holding by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/holdings/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "holdings", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Holding",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shares\": 15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/holdings/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "holdings", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Holding",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/holdings/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "holdings", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "Get Metrics History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/portfolios/1/metrics/history?limit=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "portfolios", "1", "metrics", "history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stocks",
+      "item": [
+        {
+          "name": "Get Stock Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/stocks/AAPL",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stocks", "AAPL"]
+            }
+          }
+        },
+        {
+          "name": "Get Stock Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/stocks/AAPL/analysis",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stocks", "AAPL", "analysis"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
