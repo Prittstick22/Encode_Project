@@ -166,79 +166,83 @@ def holding_detail(holding_id):
 @app.route('/api/portfolios/<int:portfolio_id>/dashboard', methods=['GET'])
 def portfolio_dashboard(portfolio_id):
     """Get comprehensive portfolio dashboard data"""
-    portfolio = Portfolio.query.get_or_404(portfolio_id)
-    holdings = Holding.query.filter_by(portfolio_id=portfolio_id).all()
-    
-    if not holdings:
-        return jsonify({
-            'portfolio': portfolio.to_dict(),
-            'summary': {
-                'total_value': 0,
-                'total_cost': 0,
-                'total_gain_loss': 0,
-                'total_gain_loss_pct': 0
-            },
-            'holdings': [],
-            'metrics': {},
-            'sector_exposure': {},
-            'ai_insights': 'No holdings in portfolio yet.'
-        })
-    
-    # Get holdings data
-    holdings_data = [h.to_dict() for h in holdings]
-    
-    # Calculate portfolio value
-    value_data = portfolio_analytics.calculate_portfolio_value(holdings_data)
-    
-    # Calculate metrics
-    metrics = portfolio_analytics.calculate_portfolio_metrics(holdings_data)
-    
-    # Get sector exposure
-    sector_exposure = portfolio_analytics.get_sector_exposure(holdings_data)
-    
-    # Update Prometheus metrics
-    portfolio_value.labels(portfolio_id=portfolio_id).set(value_data['total_value'])
-    
-    # Store metrics in database
-    portfolio_metric = PortfolioMetrics(
-        portfolio_id=portfolio_id,
-        date=datetime.utcnow(),
-        total_value=value_data['total_value'],
-        total_cost=value_data['total_cost'],
-        total_gain_loss=value_data['total_gain_loss'],
-        alpha=metrics.get('alpha'),
-        beta=metrics.get('beta'),
-        sharpe_ratio=metrics.get('sharpe_ratio')
-    )
-    db.session.add(portfolio_metric)
-    db.session.commit()
-    
-    # Generate AI insights
-    dashboard_data = {
-        'total_value': value_data['total_value'],
-        'total_cost': value_data['total_cost'],
-        'total_gain_loss': value_data['total_gain_loss'],
-        'total_gain_loss_pct': value_data['total_gain_loss_pct'],
-        'holdings': value_data['holdings'],
-        'metrics': metrics,
-        'sector_exposure': sector_exposure
-    }
-    
-    ai_insights = ai_insights_service.generate_portfolio_insights(dashboard_data)
-    
-    return jsonify({
-        'portfolio': portfolio.to_dict(),
-        'summary': {
+    try:
+        portfolio = Portfolio.query.get_or_404(portfolio_id)
+        holdings = Holding.query.filter_by(portfolio_id=portfolio_id).all()
+        
+        if not holdings:
+            return jsonify({
+                'portfolio': portfolio.to_dict(),
+                'summary': {
+                    'total_value': 0,
+                    'total_cost': 0,
+                    'total_gain_loss': 0,
+                    'total_gain_loss_pct': 0
+                },
+                'holdings': [],
+                'metrics': {},
+                'sector_exposure': {},
+                'ai_insights': 'No holdings in portfolio yet.'
+            })
+        
+        # Get holdings data
+        holdings_data = [h.to_dict() for h in holdings]
+        
+        # Calculate portfolio value
+        value_data = portfolio_analytics.calculate_portfolio_value(holdings_data)
+        
+        # Calculate metrics
+        metrics = portfolio_analytics.calculate_portfolio_metrics(holdings_data)
+        
+        # Get sector exposure
+        sector_exposure = portfolio_analytics.get_sector_exposure(holdings_data)
+        
+        # Update Prometheus metrics
+        portfolio_value.labels(portfolio_id=portfolio_id).set(value_data['total_value'])
+        
+        # Store metrics in database
+        portfolio_metric = PortfolioMetrics(
+            portfolio_id=portfolio_id,
+            date=datetime.utcnow(),
+            total_value=value_data['total_value'],
+            total_cost=value_data['total_cost'],
+            total_gain_loss=value_data['total_gain_loss'],
+            alpha=metrics.get('alpha'),
+            beta=metrics.get('beta'),
+            sharpe_ratio=metrics.get('sharpe_ratio')
+        )
+        db.session.add(portfolio_metric)
+        db.session.commit()
+        
+        # Generate AI insights
+        dashboard_data = {
             'total_value': value_data['total_value'],
             'total_cost': value_data['total_cost'],
             'total_gain_loss': value_data['total_gain_loss'],
-            'total_gain_loss_pct': value_data['total_gain_loss_pct']
-        },
-        'holdings': value_data['holdings'],
-        'metrics': metrics,
-        'sector_exposure': sector_exposure,
-        'ai_insights': ai_insights
-    })
+            'total_gain_loss_pct': value_data['total_gain_loss_pct'],
+            'holdings': value_data['holdings'],
+            'metrics': metrics,
+            'sector_exposure': sector_exposure
+        }
+        
+        ai_insights = ai_insights_service.generate_portfolio_insights(dashboard_data)
+        
+        return jsonify({
+            'portfolio': portfolio.to_dict(),
+            'summary': {
+                'total_value': value_data['total_value'],
+                'total_cost': value_data['total_cost'],
+                'total_gain_loss': value_data['total_gain_loss'],
+                'total_gain_loss_pct': value_data['total_gain_loss_pct']
+            },
+            'holdings': value_data['holdings'],
+            'metrics': metrics,
+            'sector_exposure': sector_exposure,
+            'ai_insights': ai_insights
+        })
+    except Exception as e:
+        logger.error(f"Error generating dashboard for portfolio {portfolio_id}: {str(e)}")
+        return jsonify({'error': 'Unable to generate dashboard'}), 500
 
 
 @app.route('/api/portfolios/<int:portfolio_id>/metrics/history', methods=['GET'])
@@ -276,19 +280,23 @@ def stock_info(ticker):
 @app.route('/api/stocks/<ticker>/analysis', methods=['GET'])
 def stock_analysis(ticker):
     """Get AI-powered stock analysis"""
-    ticker = ticker.upper()
-    
-    info = market_data_service.get_stock_info(ticker)
-    if not info:
-        return jsonify({'error': 'Stock not found'}), 404
-    
-    analysis = ai_insights_service.generate_stock_analysis(ticker, info)
-    
-    return jsonify({
-        'ticker': ticker,
-        'analysis': analysis,
-        'info': info
-    })
+    try:
+        ticker = ticker.upper()
+        
+        info = market_data_service.get_stock_info(ticker)
+        if not info:
+            return jsonify({'error': 'Stock not found'}), 404
+        
+        analysis = ai_insights_service.generate_stock_analysis(ticker, info)
+        
+        return jsonify({
+            'ticker': ticker,
+            'analysis': analysis,
+            'info': info
+        })
+    except Exception as e:
+        logger.error(f"Error generating analysis for {ticker}: {str(e)}")
+        return jsonify({'error': 'Unable to generate stock analysis'}), 500
 
 
 @app.errorhandler(404)
@@ -312,4 +320,5 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Use Config.DEBUG instead of hardcoded debug=True for security
+    app.run(host='0.0.0.0', port=5000, debug=app.config['DEBUG'])
